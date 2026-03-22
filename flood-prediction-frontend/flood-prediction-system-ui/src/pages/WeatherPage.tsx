@@ -105,7 +105,7 @@ function Metric3D({
   value: string
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white/60 p-3 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-950/30">
+    <div className="aspect-square rounded-xl border border-slate-200 bg-white/60 p-3 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-950/30 flex flex-col justify-center">
       <div className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-200">
         <span className="fps-glass-icon grid h-8 w-8 place-items-center">{icon}</span>
         {label}
@@ -222,9 +222,9 @@ export function WeatherPage() {
         <p className="text-sm text-slate-600 dark:text-slate-300">{t('weather.helpLine')}</p>
       </div>
 
-      <div className="grid grid-cols-12 gap-4">
-        <div className="col-span-6">
-          <Card className="relative overflow-hidden">
+      <div className="flex gap-4 items-start">
+        <div className="w-72">
+          <Card className="relative overflow-hidden aspect-square">
             <WeatherCardBackground kind={currentKind} />
 
             <CardHeader>
@@ -248,8 +248,8 @@ export function WeatherPage() {
           </Card>
         </div>
 
-        <div className="col-span-6">
-          <div className="mb-2 flex items-center justify-between gap-3">
+        <div className="w-72 flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-3">
             <div className="min-w-0 flex-1">
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200">{t('weather.searchDistrict')}</label>
               <input
@@ -257,7 +257,7 @@ export function WeatherPage() {
                 onChange={(e) => setDistrictInput(e.target.value)}
                 placeholder="e.g. Ba Dinh, Cau Giay..."
                 className={cn(
-                  'mt-1 w-full rounded-2xl border bg-white px-3 py-3 text-sm outline-none transition',
+                  'mt-1 w-full rounded-2xl border bg-white px-3 py-2.5 text-sm outline-none transition',
                   'border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-sky-400 focus:ring-4 focus:ring-sky-100',
                   'dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-sky-500 dark:focus:ring-sky-900/40',
                 )}

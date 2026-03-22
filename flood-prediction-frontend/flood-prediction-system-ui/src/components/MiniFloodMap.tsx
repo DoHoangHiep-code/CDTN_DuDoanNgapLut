@@ -40,11 +40,13 @@ export function MiniFloodMap({
   selectedDistrictId,
   center,
   zoom = 12,
+  className,
 }: {
   districts: FloodDistrict[]
   selectedDistrictId?: string
   center: LatLngExpression
   zoom?: number
+  className?: string
 }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -73,7 +75,7 @@ export function MiniFloodMap({
   }, [districts, selectedDistrictId])
 
   return (
-    <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800">
+    <div className={cn("relative aspect-square w-full overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800", className)}>
       <div className="absolute left-2 top-2 z-[5] flex items-center gap-2 rounded-xl bg-white/60 px-2 py-1 backdrop-blur dark:bg-slate-950/50">
         <span className="text-[11px] font-extrabold text-slate-800 dark:text-slate-100">{t('miniMap.radarTimelapse')}</span>
         <button
