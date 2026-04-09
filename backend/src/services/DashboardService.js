@@ -45,8 +45,16 @@ class DashboardService {
       windSpeed: Number(weatherRow?.wind_speed) || 0,
     }
 
-    const rainForecast = Array.isArray(rainRows)
-      ? rainRows.map((r) => ({ time: String(r.time), value: Number(r.value) || 0 }))
+    // Trả forecast24h theo yêu cầu tooltip dashboard:
+    // - time: "HH:mm"
+    // - prcp: lượng mưa (mm)
+    // - flood_depth_cm: độ ngập dự đoán (cm)
+    const forecast24h = Array.isArray(rainRows)
+      ? rainRows.map((r) => ({
+          time: String(r.time),
+          prcp: Number(r.prcp) || 0,
+          flood_depth_cm: Number(r.flood_depth_cm) || 0,
+        }))
       : []
 
     const riskCounts = this._normalizeRiskCounts(riskRows)
@@ -67,7 +75,9 @@ class DashboardService {
     const payload = {
       alerts,
       currentWeather,
-      rainForecast,
+      // Giữ lại rainForecast để không phá các client cũ (backward-compatible)
+      rainForecast: forecast24h.map((p) => ({ time: p.time, value: p.prcp })),
+      forecast24h,
       riskSummary: { ...riskCounts, overall },
     }
 

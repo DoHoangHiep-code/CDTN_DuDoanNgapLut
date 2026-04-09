@@ -46,24 +46,42 @@ class DashboardRepository {
   }
 
   /**
-   * 24h hourly rain forecast (last 24 hours), bucketed by local hour.
-   * Frontend expects local "HH:mm".
+   * 24h hourly forecast: mưa (prcp) + độ ngập dự đoán (flood_depth_cm), bucket theo local hour.
+   *
+   * CRITICAL:
+   * - Không aggregate trong JS (để DB làm).
+   * - Trả đúng field: time, prcp, flood_depth_cm (để tooltip dashboard hiển thị).
    */
   async getRainForecast24h() {
     const tz = 'Asia/Ho_Chi_Minh'
     const sql = `
-      SELECT
-        to_char(bucket_local, 'HH24:MI') AS time,
-        COALESCE(AVG(prcp), 0)::float AS value
-      FROM (
+      WITH wm_bucket AS (
         SELECT
           time_bucket('1 hour', (wm.time AT TIME ZONE :tz)) AS bucket_local,
           wm.prcp
         FROM weather_measurements wm
         WHERE wm.time >= now() - interval '24 hours'
-      ) x
-      GROUP BY bucket_local
-      ORDER BY bucket_local ASC
+      ),
+      fp_bucket AS (
+        SELECT
+          time_bucket('1 hour', (fp.time AT TIME ZONE :tz)) AS bucket_local,
+          fp.flood_depth_cm
+        FROM flood_predictions fp
+        WHERE fp.time >= now() - interval '24 hours'
+      )
+      SELECT
+        to_char(b.bucket_local, 'HH24:MI') AS time,
+        COALESCE(AVG(wm.prcp), 0)::float AS prcp,
+        COALESCE(AVG(fp.flood_depth_cm), 0)::float AS flood_depth_cm
+      FROM (
+        SELECT bucket_local FROM wm_bucket
+        UNION
+        SELECT bucket_local FROM fp_bucket
+      ) b
+      LEFT JOIN wm_bucket wm ON wm.bucket_local = b.bucket_local
+      LEFT JOIN fp_bucket fp ON fp.bucket_local = b.bucket_local
+      GROUP BY b.bucket_local
+      ORDER BY b.bucket_local ASC
       LIMIT 24;
     `
 

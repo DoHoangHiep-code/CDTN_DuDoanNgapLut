@@ -13,10 +13,16 @@ class AdminUserController {
   }
 
   // GET /api/v1/admin/users
-  async list(_req, res, next) {
+  async list(req, res, next) {
     try {
+      // Query params cho search/filter
+      // - q: search theo full_name/email
+      // - role: all/admin/expert/user
+      const q = typeof req.query.q === 'string' ? req.query.q : ''
+      const role = typeof req.query.role === 'string' ? req.query.role : 'all'
+
       // Lấy danh sách users (đã sanitize, không có password_hash)
-      const users = await this.adminUserService.listUsers()
+      const users = await this.adminUserService.listUsers({ q, role })
       // Trả kết quả
       return res.status(200).json({ success: true, data: users })
     } catch (err) {
